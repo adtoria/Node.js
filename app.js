@@ -43,55 +43,12 @@ app.use(express.static('public'));
 // use existing middleware:
 app.use(morgan('dev'));
 
-// mongoose and mongo sandbox routes
-app.get('/add-blog', (req, res) => {
-    const blog = new Blog({
-        title: 'new blog 2',
-        snippet: 'about my new blog',
-        body: 'more about my new blog'
-    });
-
-    blog.save()
-        .then((result) => {
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-});
-
-app.get('/all-blogs', (req, res) => {
-    Blog.find()
-        .then((result) => {
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-});
-
-app.get('/single-blog', (req, res) => {
-    Blog.findById('6533a0325daa8c5281f4d858')
-        .then((result) => {
-            res.send(result);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-});
-
+// routes
 app.get('/', (req, res) => {
     // res.send('<p>home page</p>'); // it infers the type of content automatically & also the status code
     // res.sendFile('./views/index.html', { root: __dirname});
     
-    const blogs = [
-        {title: 'Yoshi finds eggs', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'Mario finds stars', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-        {title: 'How to defeat Bowser', snippet: 'Lorem ipsum dolor sit amet consectetur'},
-    ];
-    
-    // we need to render a view
-    res.render('index', { title: 'Home', blogs });
+    res.redirect('/blogs');
 });
 
 app.get('/about', (req, res) => {
@@ -105,6 +62,17 @@ app.get('/about', (req, res) => {
 // app.get('/about-us', (req, res) => {
 //     res.redirect('/about');
 // });
+
+// blog routes
+app.get('/blogs', (req, res) => {
+    Blog.find().sort({createdAt: -1})
+        .then((result) => {
+            res.render('index', { title: 'All Blogs', blogs: result });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+});
 
 app.get('/blogs/create', (req, res) => {
     res.render('create', { title: 'Create' });
